@@ -14,7 +14,7 @@ export default class Search {
 
       return this.result;
     } catch (error) {
-      alert("Error: " + error);
+      console.log("Error: " + error);
     }
   }
 }
