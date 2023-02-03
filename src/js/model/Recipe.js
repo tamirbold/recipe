@@ -11,7 +11,19 @@ export default class Recipe {
     );
 
     this.publisher = result.data.recipe.publisher;
+    this.ingredients = result.data.recipe.ingredients;
+    this.source_url = result.data.recipe.source_url;
+    this.image_url = result.data.recipe.image_url;
+    this.publisher_url = result.data.recipe.publisher_url;
+    this.title = result.data.recipe.title;
+    this.social_rank = result.data.recipe.social_rank;
+  }
+  calcTime() {
+    //Nairlaga bur deer oiroltsoogoor 5 minut zartsuulna.
+    this.time = this.ingredients.length * 5;
+  }
 
-    console.log(this.publisher);
+  calcPerson() {
+    this.person = 4;
   }
 }
