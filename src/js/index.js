@@ -2,6 +2,7 @@ require("@babel/polyfill");
 import Search from "./model/Search";
 import { elements, renderLoader, clearLoader } from "./view/base";
 import * as searchView from "./view/searchView";
+import * as likesView from "./view/likesView";
 import Recipe from "./model/Recipe";
 import {
   renderRecipe,
@@ -9,6 +10,7 @@ import {
   highlightSelector,
 } from "./view/recipeView";
 import List from "./model/List";
+import Like from "./model/Like";
 import * as listView from "./view/listView";
 
 /* Web app state
@@ -82,7 +84,7 @@ const controlRecipe = async () => {
     state.recipe.calcPerson();
 
     //6. Show recipe on screen
-    renderRecipe(state.recipe);
+    renderRecipe(state.recipe, state.likes.isLiked(id));
   }
 };
 
@@ -91,6 +93,17 @@ const controlRecipe = async () => {
 ["hashchange", "load"].forEach((e) =>
   window.addEventListener(e, controlRecipe)
 );
+
+window.addEventListener("load", (e) => {
+  //Shineer like modeliig app achaalagdahad uusgene.
+  if (!state.likes) state.likes = new Like();
+
+  //Like menu-g gargah esehiig shiideh
+  likesView.toggleLikeMenu(state.likes.getNumberOfLikes());
+
+  //Like-uud bval menu-d nemj haruulna.
+  state.likes.likes.forEach((like) => likesView.renderLike(like));
+});
 
 //Nairlaggnii controller
 const controlList = () => {
@@ -109,9 +122,45 @@ const controlList = () => {
   });
 };
 
+//Like controller
+const controlLike = () => {
+  //1. Like-n modeliig uusgene.
+  if (!state.likes) state.likes = new Like();
+
+  //2. Odoo haragdaj bgaa joriin ID-g olj avah
+  const currentRecipeId = state.recipe.id;
+
+  //3. Ene joriig liked esehiig shalgana
+  if (state.likes.isLiked(currentRecipeId)) {
+    //Like darsan bol boliulah
+    state.likes.deleteLike(currentRecipeId);
+    //Like menu-s ustgana.
+    likesView.deleteLikedRecipe(currentRecipeId);
+    //Like button-ii liked tuluviig boliulah
+    likesView.toggleLikeBtn(false);
+  } else {
+    //Like daraagui bol like darna.
+    const newLike = state.likes.addLike(
+      currentRecipeId,
+      state.recipe.title,
+      state.recipe.publisher,
+      state.recipe.image_url
+    );
+    //Like menu-d oruulah
+    likesView.renderLike(newLike);
+
+    //Like button-ii liked tuluviig idevhijuuleh
+    likesView.toggleLikeBtn(true);
+  }
+
+  likesView.toggleLikeMenu(state.likes.getNumberOfLikes());
+};
+
 elements.recipeDiv.addEventListener("click", (e) => {
   if (e.target.matches(".recipe__btn, .recipe__btn *")) {
     controlList();
+  } else if (e.target.matches(".recipe__love, .recipe__love *")) {
+    controlLike();
   }
 });
 
